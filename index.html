@@ -308,9 +308,58 @@
         left: -28px;
       }
     }
+  
+    @media (pointer: fine) {
+      * {
+        cursor: none !important;
+      }
+
+      .cursor {
+        position: fixed;
+        top: 0;
+        left: 0;
+        margin: -3px 0 0 -3px;
+        pointer-events: none;
+        z-index: 9999;
+        opacity: 0;
+        will-change: transform;
+      }
+
+      .cursor.visible {
+        opacity: 1;
+      }
+
+      .cursor .i-stroke {
+        stroke-dasharray: 1;
+        stroke-dashoffset: 1;
+        visibility: hidden;
+        transition: stroke-dashoffset 0.25s ease-out, visibility 0s 0.25s;
+      }
+
+      .cursor.hover .i-stroke {
+        stroke-dashoffset: 0;
+        visibility: visible;
+        transition: stroke-dashoffset 0.25s ease-out, visibility 0s;
+      }
+    }
+
+    @media (pointer: coarse) {
+      .cursor {
+        display: none;
+      }
+    }
   </style>
 </head>
 <body>
+
+  <svg class="cursor" width="24" height="24" viewBox="0 0 32 32" aria-hidden="true">
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 28 L4 4 L14 28 L14 4" stroke="black" stroke-width="5"/>
+      <path class="i-stroke" pathLength="1" d="M20 28 L20 4 L23 4 A5.5 5.5 0 0 1 23 15 L20 15" stroke="black" stroke-width="5"/>
+      <path d="M4 28 L4 4 L14 28 L14 4" stroke="white" stroke-width="2.5"/>
+      <path class="i-stroke" pathLength="1" d="M20 28 L20 4 L23 4 A5.5 5.5 0 0 1 23 15 L20 15" stroke="white" stroke-width="2.5"/>
+    </g>
+  </svg>
 
   <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">&#9790;</button>
 
@@ -410,6 +459,20 @@
       root.setAttribute('data-theme', next);
       toggle.textContent = next === 'dark' ? '\u263E' : '\u2600';
       localStorage.setItem('theme', next);
+    });
+  
+    const cursor = document.querySelector('.cursor');
+
+    window.addEventListener('mousemove', (e) => {
+      cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
+      cursor.classList.add('visible');
+    });
+
+    document.addEventListener('mouseleave', () => cursor.classList.remove('visible'));
+
+    document.querySelectorAll('a, button').forEach((el) => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
     });
   </script>
 
